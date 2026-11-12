@@ -22,7 +22,7 @@ debug: $(TARGET)
 	$(QEMU) -M lm3s6965evb -nographic -s -S -kernel $(TARGET)
 
 inspect: $(TARGET)
-	python3 led_monitor.py --spawn-qemu
+	python3 debug/led_monitor.py --spawn-qemu
 
 clean:
 	rm -rf $(BUILD_DIR)

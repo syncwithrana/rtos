@@ -1,0 +1,13 @@
+# Build outputs across all lessons (l0, l1, etc.)
+*/build
+*.elf
+*.bin
+*.o
+*.d
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+
+# OS files
+.DS_Store
