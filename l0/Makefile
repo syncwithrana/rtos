@@ -21,8 +21,8 @@ run: $(TARGET)
 debug: $(TARGET)
 	$(QEMU) -M lm3s6965evb -nographic -s -S -kernel $(TARGET)
 
-gdb: $(TARGET)
-	$(GDB) $(TARGET) -x watch_gpio.gdb
+inspect: $(TARGET)
+	python3 led_monitor.py --spawn-qemu
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -32,4 +32,4 @@ kill:
 	-killall -9 arm-none-eabi-gdb 2>/dev/null || true
 	-killall -9 gdb 2>/dev/null || true
 
-.PHONY: all run debug gdb clean kill
+.PHONY: all run debug inspect clean kill
