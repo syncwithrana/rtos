@@ -1,12 +1,13 @@
 #ifndef BSP_H
 #define BSP_H
 
+#include <stdint.h>
+
 /* system clock tick [Hz] */
 #define BSP_TICKS_PER_SEC 100U
 
 void BSP_init(void);
 void BSP_delay(uint32_t ticks);
-uint32_t BSP_tickCtr(void);
 
 void BSP_ledRedOn(void);
 void BSP_ledRedOff(void);
