@@ -23,17 +23,18 @@ void Default_Handler(void) {
 }
 
 /* Weak aliases: default to Default_Handler unless implemented elsewhere */
+void NMI_Handler(void)     __attribute__((weak, alias("Default_Handler")));
 void SysTick_Handler(void) __attribute__((weak, alias("Default_Handler")));
 void PendSV_Handler(void)  __attribute__((weak, alias("Default_Handler")));
 
 __attribute__((section(".isr_vector"))) const uint32_t vector_table[] = {
     (uint32_t)&_estack,
     (uint32_t)Reset_Handler,
-    (uint32_t)Default_Handler, /* NMI */
-    (uint32_t)Default_Handler, /* HardFault */
-    (uint32_t)Default_Handler, /* MemManage */
-    (uint32_t)Default_Handler, /* BusFault */
-    (uint32_t)Default_Handler, /* UsageFault */
+    (uint32_t)NMI_Handler,      /* NMI */
+    (uint32_t)Default_Handler,  /* HardFault */
+    (uint32_t)Default_Handler,  /* MemManage */
+    (uint32_t)Default_Handler,  /* BusFault */
+    (uint32_t)Default_Handler,  /* UsageFault */
     0,
     0,
     0,
@@ -41,6 +42,6 @@ __attribute__((section(".isr_vector"))) const uint32_t vector_table[] = {
     (uint32_t)Default_Handler,  /* SVCall */
     (uint32_t)Default_Handler,  /* Debug Monitor */
     0,                          /* Reserved */
-    (uint32_t)PendSV_Handler,   /* PendSV -> handled in miros.c or Default_Handler */
-    (uint32_t)SysTick_Handler   /* SysTick -> handled in bsp.c or Default_Handler */
+    (uint32_t)PendSV_Handler,   /* PendSV -> handled in qxk_port.c */
+    (uint32_t)SysTick_Handler   /* SysTick -> handled in bsp.c */
 };

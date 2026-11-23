@@ -39,7 +39,7 @@ static inline uint32_t SysTick_Config(uint32_t ticks) {
 
 static inline void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority) {
     if (IRQn == SysTick_IRQn) {
-        SCB_SHPR3 = (SCB_SHPR3 & 0x00FFFFFFU) | (priority << 29U);
+        SCB_SHPR3 = (SCB_SHPR3 & 0x00FFFFFFU) | (priority << 24U);
     }
 }
 
@@ -68,4 +68,3 @@ typedef struct {
 #define FPGAIO      ((FPGAIO_Type *)FPGAIO_BASE)
 
 #endif /* MPS2_AN385_H */
-

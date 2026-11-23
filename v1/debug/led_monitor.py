@@ -32,7 +32,13 @@ def make_led(is_on, bright, dim):
     return f"\033[1;{bright}m( ● )\033[0m" if is_on else f"\033[2;{dim}m( ○ )\033[0m"
 
 
-def wait_for_port(port, timeout=2.0):
+def get_free_port():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+def wait_for_port(port, timeout=3.0):
     start = time.time()
     while time.time() - start < timeout:
         try:
@@ -51,16 +57,24 @@ def main():
     parser.add_argument("--machine", default=None)
     parser.add_argument("--qemu", default="qemu-system-arm")
     parser.add_argument("--gdb", default="arm-none-eabi-gdb")
-    parser.add_argument("--target", default=":1234")
+    parser.add_argument("--target", default=None)
     args = parser.parse_args()
 
     leds = parse_leds(args.leds)
-    port = int(args.target.split(":")[-1]) if ":" in args.target else 1234
+
+    if args.machine:
+        port = get_free_port()
+        args.target = f":{port}"
+    else:
+        port = int(args.target.split(":")[-1]) if args.target and ":" in args.target else 1234
+        if not args.target:
+            args.target = ":1234"
+
     qemu_proc = None
     gdb_proc = None
     script_path = None
 
-    def cleanup(*_):
+    def cleanup():
         sys.stdout.write("\033[?25h\r\033[K")
         sys.stdout.flush()
         if gdb_proc:
@@ -78,13 +92,16 @@ def main():
                 os.remove(script_path)
             except Exception:
                 pass
+
+    def sig_exit(*_):
+        cleanup()
         os._exit(0)
 
-    signal.signal(signal.SIGINT, cleanup)
-    signal.signal(signal.SIGTERM, cleanup)
+    signal.signal(signal.SIGINT, sig_exit)
+    signal.signal(signal.SIGTERM, sig_exit)
 
     if args.machine:
-        qemu_cmd = [args.qemu, "-M", args.machine, "-nographic", "-s", "-S", "-kernel", args.elf]
+        qemu_cmd = [args.qemu, "-M", args.machine, "-nographic", "-gdb", f"tcp::{port}", "-S", "-kernel", args.elf]
         try:
             qemu_proc = subprocess.Popen(
                 qemu_cmd,
@@ -97,8 +114,11 @@ def main():
             sys.exit(f"Failed to start QEMU: {e}")
 
         if not wait_for_port(port):
+            err = ""
+            if qemu_proc and qemu_proc.poll() is not None:
+                err = qemu_proc.stderr.read().decode(errors="replace")
             cleanup()
-            sys.exit(f"Target port {port} not responding.")
+            sys.exit(f"Target port {port} not responding. {err}")
 
     gdb_script = (
         "set pagination off\n"
