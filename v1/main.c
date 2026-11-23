@@ -30,9 +30,9 @@ static void main_blinky2(void) {
         /* visible burst of toggling Blue LED */
         for (int count = 0; count < 6; ++count) {
             BSP_ledBlueOn();
-            for (i = 50000U; i != 0U; --i) {}
+            for (i = 30000U; i != 0U; --i) {}
             BSP_ledBlueOff();
-            for (i = 50000U; i != 0U; --i) {}
+            for (i = 30000U; i != 0U; --i) {}
         }
     }
 }
@@ -40,7 +40,9 @@ static void main_blinky2(void) {
 /* Thread 3: Low Priority (1) - Sends Morse code "TEST" */
 static void main_blinky3(void) {
     while (1) {
+        BSP_ledRedOn();
         BSP_sendMorseCode(0xE22A3800U); /* "TEST" */
+        BSP_ledRedOff();
         OSThread_delay(30U);            /* 30 ticks pause so idle/SOS can run */
     }
 }

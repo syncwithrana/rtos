@@ -2,7 +2,7 @@ CC          = arm-none-eabi-gcc
 GDB         = arm-none-eabi-gdb
 QEMU        = qemu-system-arm
 QEMU_MACH   = mps2-an385
-LED_ADDR    = 0x40028000
+LED_ADDR    = 0x4002801C
 LED_MAP     = G:0,R:1,B:2,Y:3
 
 CFLAGS  = -mcpu=cortex-m3 -mthumb -ffreestanding -O0 -g -Wall -I. -Ibsp -Iplatform
